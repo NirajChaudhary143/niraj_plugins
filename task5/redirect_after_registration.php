@@ -25,7 +25,7 @@ ob_get_flush();
 </head>
 
 <body>
-    <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="POST">
+    <form action="" method="POST">
         <label for="">Email</label>
         <input type="email" name="email">
         <label for="">Password</label>

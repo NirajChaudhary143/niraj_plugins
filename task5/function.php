@@ -34,7 +34,7 @@ class SubmitForm
             foreach ($metaDataArr as $key => $value) {
                 update_user_meta($this->id, $key, $value);
             }
-            wp_redirect('http://localhost/themeGrill/task3/2024/01/08/title-11/');
+            echo "User Registered Succefully";
         }
     }
 }
