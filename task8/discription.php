@@ -11,7 +11,7 @@ class movieDescription
     }
     public function cmb_movie_discription_fn($post)
     {
-        $movieDisc = get_post_meta($post->ID, 'movie_discription', true);
+        $movieDisc = get_post_meta($post->ID, 'cmb_movie_discription', true);
         error_log($movieDisc);
 ?>
         <textarea name="movie_discription" id="" cols="30" rows="3"><?php echo $movieDisc; ?></textarea>
@@ -20,7 +20,7 @@ class movieDescription
     public function cmb_save_movie_discription_fn($post_id)
     {
         if (isset($_POST['movie_discription'])) {
-            update_post_meta($post_id, 'movie_discription', $_POST['movie_discription']);
+            update_post_meta($post_id, 'cmb_movie_discription', $_POST['movie_discription']);
         }
     }
 }

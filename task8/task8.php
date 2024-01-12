@@ -22,7 +22,7 @@ class MetaBox
         add_action('save_post', array($movieObj, 'cmb_save_movie_category_fn'));
         add_action('add_meta_boxes', array($movieDisc, 'cmb_movie_description'));
         add_action('save_post', array($movieDisc, 'cmb_save_movie_discription_fn'));
-        add_action('comment_form_before', array($this, 'cmb_render_content'));
+        add_filter('the_content', array($this, 'cmb_render_content'));
     }
     function cmb_add_custom_box()
     {
@@ -30,7 +30,7 @@ class MetaBox
     }
     function cmb_description_fn($post)
     {
-        $movie_lang = get_post_meta($post->ID, 'language', true);
+        $movie_lang = get_post_meta($post->ID, 'cmb_language', true);
         error_log(print_r($movie_lang, true));
 ?>
         <input type="text" name="language" value="<?php echo $movie_lang ?>">
@@ -42,22 +42,26 @@ class MetaBox
     {
         if (isset($_POST['language'])) {
 
-            update_post_meta($post_id, 'language', $_POST['language']);
+            update_post_meta($post_id, 'cmb_language', $_POST['language']);
         }
     }
-    public function cmb_render_content()
+    public function cmb_render_content($content)
     {
-        global $post;
-        $content = get_post_meta($post->ID);
-        foreach ($content as $key => $values) {
-            if ($key == "_edit_lock" || $key == "_edit_last" || $key == "_pingme" || $key == "_encloseme") {
-                continue;
+        if (is_single()) {
+            $after_content = '';
+            global $post;
+            $cmb_content = get_post_meta($post->ID);
+            foreach ($cmb_content as $key => $values) {
+                // error_log(print_r(strpos($key, "cmb_")));
+                if (strpos($key, "cmb_") !== false) {
+                    foreach ($values as $value) {
+                        $after_content .= $key . " = " . $value . "<br>";
+                    }
+                }
             }
-            echo "Key: " . $key;
-            foreach ($values as $value) {
-                echo ", Value: " . $value . "<br>";
-            }
+            $content .= $after_content;
         }
+        return $content;
     }
 }
 new MetaBox();
