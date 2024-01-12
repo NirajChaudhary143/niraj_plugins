@@ -28,12 +28,19 @@ class customPostType extends customMetaBox
             'cpt_movie',
             array(
                 'labels' => array(
-                    'name' => __('Movies'),
-                    'singular_name' => __('Movie')
+                    'menu_name' => 'Movies',
+                    'name' => 'Movie',
+                    'singular_name' => 'Movie',
+                    'add_new_item' => 'Add New Movie',
+                    'search_items' => 'Search Movie',
+                    'all_items' => 'All Movies',
+                    'edit_item' => 'Edit Movie',
+                    'add_new' => 'Add New Movie',
                 ),
                 'public' => true,
                 'has_archive' => true,
                 'menu_icon' => 'dashicons-video-alt3',
+                'taxonomies' => array('category', 'post_tag'),
             )
         );
     }
