@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * Plugin Name: Custom Taxonomies
+ * Description: Create a Custom Taxonomies called Fruits with where we can add terms like Banana, Apple, Orange etc. 
+ * 
+ */
 class TestCustom
 {
     function cts_movie_custom_test()
