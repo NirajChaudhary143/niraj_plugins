@@ -30,14 +30,14 @@ class movieForm
     }
     public function hobby_fn()
     {
+        $values = array();
         if (get_option('hobbies')) {
-
             $values = get_option('hobbies');
         }
-        $values = array();;
+        error_log(print_r($values, true));
         echo '<input type="checkbox" name="hobbies[]" id="" value="singing" ' . (in_array("singing", $values) ? "checked" : "") . '>
         <label>Singing</label>
-        <input type="checkbox" name="hobbies[]" id="" value="dancing" ' . (in_array("dancing", $values) == "dancing" ? "che cked" : "") . '>
+        <input type="checkbox" name="hobbies[]" id="" value="dancing" ' . (in_array("dancing", $values) == "dancing" ? "checked" : "") . '>
         <label>Dancing</label>
         <input type="checkbox" name="hobbies[]" id="" value="coding" ' . (in_array("coding", $values) == "coding" ? "checked" : "") . '>
         <label>Coding</label>
