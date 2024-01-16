@@ -55,7 +55,7 @@ class MetaBox
                 // error_log(print_r(strpos($key, "cmb_")));
                 if (strpos($key, "cmb_") !== false) {
                     foreach ($values as $value) {
-                        $after_content .= $key . " = " . $value . "<br>";
+                        $after_content .= $key . " = " . ucfirst($value) . "<br>";
                     }
                 }
             }
