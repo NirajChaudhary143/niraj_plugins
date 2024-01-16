@@ -1,29 +1,53 @@
 <?php
 
 /**
- * Plugin Name: Custom Taxonomies
- * Description: Create a Custom Taxonomies called Fruits with where we can add terms like Banana, Apple, Orange etc. 
- * 
+ *Plugin Name: Custom Taxonomies 
+ * Version: 1.0
+ * Description: Taxonomies 
+ * Author: Samyog Subedi
+ * Text Domain : ct_
  */
-class TestCustom
-{
-    function cts_movie_custom_test()
-    {
-        register_post_type('cts_fruits_test', array(
-            'labels' => array(
-                'menu_name' => 'Fruits Test',
-                'name' => 'Fruit Test',
-                'singular_name' => 'Fruit Test',
-                'all_items' => 'All Fruits Test',
-                'add_new_item' => 'Add New Fruit Test',
-                'edit_item' => 'Edit Fruit Test',
-                'add_new' => 'Add New Fruit Test'
-            ),
-            'public' => true,
-            'has_archive' => true,
-            'menu_icon' => 'dashicons-carrot',
-            'taxonomies' => array('cts_fruits_taxonomy', 'post_tag', 'category')
 
-        ));
+class MyFruits
+{
+    public function __construct()
+    {
+        add_action('init', array($this, 'ct_register_fruit'));
+    }
+    public function ct_register_fruit()
+    {
+        $labels = array(
+            'name' => ('Fruits'),
+            'add_new' => ('Add New Fruits'),
+            'new_item_name' => ('New Fruit Name'),
+            'update_item'  => ('Update Fruit'),
+            'edit_item'  => ('Edit Fruit'),
+            'menu_name' => ('Fruits'),
+            'search_items' => ('Search Fruits'),
+            'all_items' => ('All Fruits'),
+            'add_new_item' => ('Add New Fruits'),
+
+
+
+        );
+        $args = array(
+            'labels' => $labels,
+            'public' => true,
+            'taxonomies' => array('category'),
+            'show_ui' => true,
+
+        );
+
+        register_post_type('fruits', $args);
+        register_taxonomy(
+            'fruits_tag',
+            'fruits',
+            array(
+                'label' => ('Fruits Tag'),
+                'hierarchical' => true,
+                'show_admin_column' => true,
+            )
+        );
     }
 }
+new MyFruits();
