@@ -21,10 +21,12 @@ class UM_Form_Render
         add_action('wp_enqueue_scripts', array($this, 'um_load_scripts'));
         add_action('wp_ajax_um-store-data', array($this, 'um_save_employee_details'));
         add_action('wp_ajax_um-get-data', array($this, 'um_get_employee_details'));
+        add_action('wp_ajax_um-update-employee-details', array($this, 'um_update_employee_details_fn'));
         add_action('um_save_employee_details', array($this, 'um_save_employee_details_fn'), 10, 7);
 
         // Filter Hooks
         add_filter('um_get_emplaoyee_data', array($this, 'um_get_employee_data_fn'));
+        add_filter('um_update_emplaoyee_data', array($this, 'um_update_employee_data_fn'), 10, 2);
     }
     /**
      * um_load_scripts function
@@ -105,7 +107,7 @@ class UM_Form_Render
     ?>
         <div>
             <div id="edit_form">
-                
+
             </div>
             <table>
                 <thead>
@@ -201,6 +203,29 @@ class UM_Form_Render
     {
         $data = $_GET['data'];
         wp_send_json_success(array('emp_data' => $data));
+    }
+
+    public function um_update_employee_details_fn()
+    {
+        $id = $_POST['id'];
+        $data = $_POST['emp_data'];
+        $data = apply_filters('um_update_emplaoyee_data', $data, $id);
+        wp_send_json_success(array('updated_data' => $data));
+    }
+    public function um_update_employee_data_fn($data, $id)
+    {
+        global $wpdb, $table_prefix;
+        $wp_emp = $table_prefix . 'emp';
+        $fullname = $data['fullname'];
+        $contact_number = $data['contact'];
+        $gender = $data['gender'];
+        $employee_status = $data['employee_status'];
+        $email = $data['email'];
+        $user_bio = $data['user_bio'];
+        $query = "UPDATE `$wp_emp` SET `fullname` = '$fullname', `email` = '$email', `contact_number` = '$contact_number', `gender` = '$gender', `user_bio` = '$user_bio', `employee_status` = '$employee_status' WHERE `id` = $id";
+        $wpdb->query($query);
+        $data = $wpdb->get_results("SELECT * FROM $wp_emp WHERE id =$id");
+        return $data;
     }
 }
 new UM_Form_Render();
