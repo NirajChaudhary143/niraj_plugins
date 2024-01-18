@@ -1,4 +1,97 @@
+     /**
+            * Editing the table using ajax
+            */
+     function edit_employee_table(id) {
+        //feild part to get feild id
+        var name_field = "#name_field_"+id;
+        var email_field = "#email_field_"+id;
+        var gender_field = "#gender_field_"+id;
+        var contact_field = "#contact_field_"+id;
+        var user_bio_field = "#user_bio_field_"+id;
+        var employee_status_field = "#employee_status_field_"+id;
+
+        // edit part
+        var edit_fullname = "#edit_fullname_"+id;
+        var edit_email = "#edit_email_"+id;
+        var edit_contact = "#edit_contact_"+id;
+        var edit_gender = "#edit_gender_"+id;
+        var edit_user_bio = "#edit_user_bio_"+id;
+        var edit_employee_status = "#edit_employee_status_"+id;
+        var edit_employee = "#edit_employee_"+id;
+        var update_employee = "#update_employee_"+id;
+        
+        // hide data
+        jQuery(name_field).css("display","none");
+        jQuery(email_field).css("display","none");
+        jQuery(contact_field).css("display","none");
+        jQuery(gender_field).css("display","none");
+        jQuery(user_bio_field).css("display","none");
+        jQuery(employee_status_field).css("display","none");
+
+        // edit
+        jQuery(edit_fullname).css("display","block");
+        jQuery(edit_email).css("display","block");
+        jQuery(edit_contact).css("display","block");
+        jQuery(edit_employee).css("display","block");
+        jQuery(edit_employee_status).css("display","block");
+        jQuery(edit_gender).css("display","block");
+        jQuery(edit_user_bio).css("display","block");
+
+        // toggle edit and update button
+        jQuery(edit_employee).css("display","none");
+        jQuery(update_employee).css("display","block");
+    }
+
+    /**
+     * when page is loaded
+     */
 jQuery(document).ready(function( $ ){
+    /**
+     * function getEmployeeData
+     * Fetching the data using ajax adn display it on 
+     */
+    getEmployeeData();
+
+    function getEmployeeData() {
+        ajaxurl = um_employee_url_obj.ajaxurl;
+        $.ajax({
+            type: "GET",
+            url: ajaxurl,
+            data: {
+                action: 'um-get-data',
+                data: um_employee_url_obj.data
+            },
+            success: function (response) {
+                emp_array_data = response.data.emp_data;
+                var i = 0;
+
+                emp_array_data.forEach(element => {
+                    /**
+                     * Hide edit button when clicked on edit and render update button
+                     * 
+                     * Hide all values from table which is selected and render input fields
+                     */
+                    var html = `<tr>
+                        <td>${++i}</td>
+                        <td>Image</td>
+                        <td><span id="name_field_${element.id}">${element.fullname}</span><input id="edit_fullname_${element.id}" type="text" style="display:none" value="${element.fullname}"></td>
+                        <td><span id="email_field_${element.id}">${element.email}</span><input id="edit_email_${element.id}" type="text" style="display:none" value="${element.email}"></td>
+                        <td><span id="contact_field_${element.id}">${element.contact_number}</span><input id="edit_contact_${element.id}" type="text" style="display:none" value="${element.contact_number}"></td>
+                        <td><span id="gender_field_${element.id}">${element.gender}</span><input id="edit_gender_${element.id}" type="text" style="display:none" value="${element.gender}"></td>
+                        <td><span id="user_bio_field_${element.id}">${element.user_bio}</span><input id="edit_user_bio_${element.id}" type="text" style="display:none" value="${element.user_bio}"></td>
+                        <td><span id="employee_status_field_${element.id}">${element.employee_status}</span><input id="edit_employee_status_${element.id}" type="text" style="display:none" value="${element.employee_status}"></td>
+                        <td>
+                            <button id="edit_employee_${element.id}" onclick="edit_employee_table(${element.id})">Edit</button>
+                            <button id="update_employee_${element.id}" onclick="update_employee_table(${element.id})" style="display:none">Update</button>
+                            <button id="delete_employee_${element.id}">Delete</button>
+                        </td>
+                        </tr>`;
+                    $("#um_emp_table").append(html);
+                });
+            }
+        });
+    }
+    
 
     /**
      * Onchange of employee status
@@ -100,7 +193,7 @@ jQuery(document).ready(function( $ ){
     
     /**
      * Validate gender
-         * @param gender 
+     * @param gender 
     */
    function validate_gender( gender ){
        if (!gender) {
@@ -138,11 +231,11 @@ jQuery(document).ready(function( $ ){
             var gender =$("input[name='gender']:checked").val(); 
             validate_gender(gender);
 
-            /**
-             * Using ajax for storing the data into database
-             * 
-             * If any error occurs then don't call ajax request
-             */
+     /**
+      * Using ajax for storing the data into database
+      * 
+      * If any error occurs then don't call ajax request
+      */
 
             if ($("#error_name").text() || $("#error_email").text() || $("#error_phone_number").text() || $("#error_user_bio").text() || $("#error_status").text() || $("#error_gender").text()) {
                 return;
@@ -163,9 +256,13 @@ jQuery(document).ready(function( $ ){
                     nonce: um_employee_url_obj.nonce 
                 },
                 success: function( response ){
-                    $("#success").text("User Register Succesfully");
+                    $("#success").html('<span style="background-color: green; color:white;padding:4px">User Register Succesfully.</span>'); 
                     
                 }
             });
         }); 
+    })
+
+    jQuery("#um_emp_table").ready(function($){
+       
     })
