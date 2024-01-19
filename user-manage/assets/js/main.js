@@ -53,18 +53,6 @@
         var edit_user_bio = "#edit_user_bio_"+id;
         var edit_employee_status = "#edit_employee_status_"+id;
 
-        // Button id
-        var edit_employee = "#edit_employee_"+id;
-        var update_employee = "#update_employee_"+id;
-
-        //feild part to get feild id
-        var name_field = "#name_field_"+id;
-        var email_field = "#email_field_"+id;
-        var gender_field = "#gender_field_"+id;
-        var contact_field = "#contact_field_"+id;
-        var user_bio_field = "#user_bio_field_"+id;
-        var employee_status_field = "#employee_status_field_"+id;
-
         // Get the value from edit form input
         var fullname = jQuery(edit_fullname).val();
         var email = jQuery(edit_email).val();
@@ -73,25 +61,7 @@
         var user_bio = jQuery(edit_user_bio).val();
         var employee_status = jQuery(edit_employee_status).val();
 
-        // Toggle edit and update button
-        jQuery(edit_employee).css("display","block");
-        jQuery(update_employee).css("display","none");
-
-        // display data
-        jQuery(name_field).css("display","block");
-        jQuery(email_field).css("display","block");
-        jQuery(contact_field).css("display","block");
-        jQuery(gender_field).css("display","block");
-        jQuery(user_bio_field).css("display","block");
-        jQuery(employee_status_field).css("display","block");
-
-        // Hide edit input
-        jQuery(edit_fullname).css("display","none");
-        jQuery(edit_email).css("display","none");
-        jQuery(edit_contact).css("display","none");
-        jQuery(edit_employee_status).css("display","none");
-        jQuery(edit_gender).css("display","none");
-        jQuery(edit_user_bio).css("display","none");
+        // employee data array
         var dataArr = {
             'fullname':fullname,
             'email':email,
@@ -110,42 +80,36 @@
                 emp_data: dataArr,
             },
             success: function(response){
-                var emp_data =  response.data.updated_data;
-                emp_data.forEach(value =>{
-                    jQuery(name_field).text(value.fullname);
-                    jQuery(email_field).text(value.email);
-                    jQuery(contact_field).text(value.contact_number);
-                    jQuery(gender_field).text(value.gender);
-                    jQuery(user_bio_field).text(value.user_bio);
-                    jQuery(employee_status_field).text(value.employee_status);
-                })
-
+                getEmployeeData();
             }
         });
     }
 /**
  * getEmployeeData is a function which load the data in employee table
  */
-    function getEmployeeData() {
+    function getEmployeeData(order="",orderBy="") {
+        console.log(order);
         ajaxurl = um_employee_url_obj.ajaxurl;
         jQuery.ajax({
             type: "GET",
             url: ajaxurl,
             data: {
                 action: 'um-get-data',
-                data: um_employee_url_obj.data
+                order: order,
+                orderby: orderBy,
             },
             success: function (response) {
+                console.log("get emp data");
                 emp_array_data = response.data.emp_data;
                 var i = 0;
-
+                var html= ''
                 emp_array_data.forEach(element => {
                     /**
                      * Hide edit button when clicked on edit and render update button
                      * 
                      * Hide all values from table which is selected and render input fields
                      */
-                    var html = `<tr>
+                    html += `<tr>
                         <td>${++i}</td>
                         <td>Image</td>
                         <td><span id="name_field_${element.id}">${element.fullname}</span><input id="edit_fullname_${element.id}" type="text" style="display:none" value="${element.fullname}"></td>
@@ -160,8 +124,8 @@
                             <button id="delete_employee_${element.id}">Delete</button>
                         </td>
                         </tr>`;
-                    jQuery("#um_emp_table").append(html);
-                });
+                    });
+                    jQuery("#um_emp_table").empty().append(html);
             }
         });
     }
@@ -344,8 +308,14 @@ jQuery(document).ready(function( $ ){
                 }
             });
         }); 
-    })
-
-    jQuery("#um_emp_table").ready(function($){
-       
+    
+        /**
+         * Order by employee name
+         */
+    
+        $("#order_emp_select").change(function(){
+            var order = jQuery("#order_emp_select").val();
+            var orderBy = "fullname";
+           getEmployeeData(order,orderBy);
+        })
     })

@@ -25,7 +25,7 @@ class UM_Form_Render
         add_action('um_save_employee_details', array($this, 'um_save_employee_details_fn'), 10, 7);
 
         // Filter Hooks
-        add_filter('um_get_emplaoyee_data', array($this, 'um_get_employee_data_fn'));
+        add_filter('um_get_emplaoyee_data', array($this, 'um_get_employee_data_fn'), 10, 3);
         add_filter('um_update_emplaoyee_data', array($this, 'um_update_employee_data_fn'), 10, 2);
     }
     /**
@@ -36,14 +36,10 @@ class UM_Form_Render
 
     public function um_load_scripts()
     {
-        $data = array();
-        // apply_filters get the employee data
-        $data = apply_filters('um_get_emplaoyee_data', $data);
         wp_enqueue_script('um_javascript_handler', plugins_url("/assets/js/main.js", __DIR__), array('jquery'), '1.0.0', true);
         wp_localize_script('um_javascript_handler', 'um_employee_url_obj', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
             'nonce'   => wp_create_nonce('um_employee_nonce'),
-            'data'    => $data,
         ));
     }
 
@@ -99,6 +95,7 @@ class UM_Form_Render
     }
 
     /**
+     * Shortcode : um_employee_table
      * um_employee_table_template funtion render the employee tables
      */
     public function um_employee_table_template()
@@ -114,12 +111,19 @@ class UM_Form_Render
                     <tr>
                         <th>S.N.</th>
                         <th>Image</th>
-                        <th>Employee Name</th>
-                        <th>Email</th>
-                        <th>Contact Number</th>
-                        <th>Gender</th>
-                        <th>User Bio</th>
-                        <th>Employee Status</th>
+                        <th>
+                            Employee Name
+                            <select name="order_emp" id="order_emp_select">
+                                <option value="" disabled selected>Select Order</option>
+                                <option value="ASC">Ascending</option>
+                                <option value="DESC">Descending</option>
+                            </select>
+                        </th>
+                        <th id="email_order">Email</th>
+                        <th id="contact_number_order">Contact Number</th>
+                        <th id="gender_order">Gender</th>
+                        <th id="user_bio_order">User Bio</th>
+                        <th id="emp_status_order">Employee Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -188,23 +192,47 @@ class UM_Form_Render
     /**
      * um_get_employee_data_fn function returns the employee data
      * 
+     * hooked by custom filter hook : um_get_emplaoyee_data
+     * 
      * @param array $data is for returning the employee data
      */
-    public function um_get_employee_data_fn($data)
+    public function um_get_employee_data_fn($data, $order, $orderBy)
     {
         global $wpdb, $table_prefix;
         $wp_emp = $table_prefix . 'emp';
-        $query = "SELECT * FROM $wp_emp";
-        $data = $wpdb->get_results($query);
-        return $data;
+        if ($order != "" && $orderBy != "") {
+            $data = $wpdb->get_results("SELECT * FROM $wp_emp ORDER BY $orderBy $order");
+            return $data;
+        } else {
+            $query = "SELECT * FROM $wp_emp";
+            $data = $wpdb->get_results($query);
+            return $data;
+        }
     }
 
+
+    /**
+     * um_get_employee_details function handles the action from wp_ajax_um-get-data requests
+     */
     public function um_get_employee_details()
     {
-        $data = $_GET['data'];
+        $data = array();
+        if (isset($_GET['order'], $_GET['orderby'])) {
+            $orderBy = $_GET['orderby'];
+            $order = $_GET['order'];
+        } else {
+            $orderBy = '';
+            $order = '';
+        }
+        // apply_filters get the employee data
+        $data = apply_filters('um_get_emplaoyee_data', $data, $order, $orderBy);
+        error_log(print_r($data, true));
         wp_send_json_success(array('emp_data' => $data));
     }
 
+    /**
+     * um_update_employee_details_fn function handel the action request from wp_ajax_um-update-employee-details ajax request
+     */
     public function um_update_employee_details_fn()
     {
         $id = $_POST['id'];
@@ -212,16 +240,20 @@ class UM_Form_Render
         $data = apply_filters('um_update_emplaoyee_data', $data, $id);
         wp_send_json_success(array('updated_data' => $data));
     }
+
+    /**
+     * um_update_emplaoyee_data_fn function is hooked by custom filer hook um_update_emplaoyee_data
+     */
     public function um_update_employee_data_fn($data, $id)
     {
         global $wpdb, $table_prefix;
         $wp_emp = $table_prefix . 'emp';
-        $fullname = $data['fullname'];
-        $contact_number = $data['contact'];
-        $gender = $data['gender'];
-        $employee_status = $data['employee_status'];
-        $email = $data['email'];
-        $user_bio = $data['user_bio'];
+        $fullname = esc_html($data['fullname']);
+        $contact_number = esc_html($data['contact']);
+        $gender = esc_html($data['gender']);
+        $employee_status = esc_html($data['employee_status']);
+        $email = esc_html($data['email']);
+        $user_bio = esc_html($data['user_bio']);
         $query = "UPDATE `$wp_emp` SET `fullname` = '$fullname', `email` = '$email', `contact_number` = '$contact_number', `gender` = '$gender', `user_bio` = '$user_bio', `employee_status` = '$employee_status' WHERE `id` = $id";
         $wpdb->query($query);
         $data = $wpdb->get_results("SELECT * FROM $wp_emp WHERE id =$id");
