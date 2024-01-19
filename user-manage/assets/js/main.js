@@ -86,6 +86,7 @@
 
     /**
      * delete_employee_table function is used to delete the employee from table
+     * @param {integer} id 
      */
     function delete_employee_table(id) {
         var confirmDelete = confirm("Are you sure want to delete employee details.");
@@ -110,6 +111,9 @@
     }
 /**
  * getEmployeeData is a function which load the data in employee table
+ * 
+ * @param {string} [order=""] 
+ * @param {string} [orderBy=""] 
  */
     function getEmployeeData(order="",orderBy="") {
         console.log(order);
@@ -127,11 +131,6 @@
                 var i = 0;
                 var html= ''
                 emp_array_data.forEach(element => {
-                    /**
-                     * Hide edit button when clicked on edit and render update button
-                     * 
-                     * Hide all values from table which is selected and render input fields
-                     */
                     html += `<tr>
                         <td>${++i}</td>
                         <td><img src="${element.picture}"  width="50" height="50"></td>
@@ -182,7 +181,7 @@
     }
 
     /**
-     * when page is loaded
+     * when document get loaded data are extracted using ajax request
      */
 jQuery(document).ready(function( $ ){
     /**
@@ -207,7 +206,7 @@ jQuery(document).ready(function( $ ){
 
     /**
      * username validation function
-     * @param fullname 
+     * @param {string} fullname 
     */
     function validate_name( fullname ) {
         let regexName = /^[a-zA-Z\s]+$/
@@ -224,7 +223,7 @@ jQuery(document).ready(function( $ ){
 
     /**
      * Employee email validation
-     * @param email 
+     * @param {string} email 
      */
     function  validate_email( email ) {
         let regexEmail = /^[a-z0-9]+@[a-z]+\.[a-z]{2,3}$/;
@@ -241,7 +240,7 @@ jQuery(document).ready(function( $ ){
     
     /**
      * Contact number validation
-     * @param contact_number 
+     * @param {string} contact_number 
     */
    function  validate_phone_number( contact_number ) {
        let regexPhone = /^[9]+[0-9]{9}$/
@@ -264,7 +263,7 @@ jQuery(document).ready(function( $ ){
     /**
      * Employee bio validation
      * 
-     * @param user_bio 
+     * @param {string} user_bio 
     */
    
    function validate_user_bio(user_bio) {
@@ -278,7 +277,7 @@ jQuery(document).ready(function( $ ){
     
     /**
      * Validate employee status
-     * @param employee_status 
+     * @param {string} employee_status 
     */
    function validate_status( employee_status ){
        if ( !employee_status ) {
@@ -291,7 +290,7 @@ jQuery(document).ready(function( $ ){
     
     /**
      * Validate gender
-     * @param gender 
+     * @param {string} gender 
     */
    function validate_gender( gender ){
        if (!gender) {

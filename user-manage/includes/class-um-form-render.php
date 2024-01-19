@@ -220,6 +220,8 @@ class UM_Form_Render
     public function um_get_employee_data_fn($data, $order, $orderBy)
     {
         global $wpdb, $table_prefix;
+        $order = esc_sql($order);
+        $orderBy = esc_sql($orderBy);
         $wp_emp = $table_prefix . 'emp';
         if ($order != "" && $orderBy != "") {
             $data = $wpdb->get_results("SELECT * FROM $wp_emp ORDER BY $orderBy $order");
@@ -269,13 +271,13 @@ class UM_Form_Render
     {
         global $wpdb, $table_prefix;
         $wp_emp = $table_prefix . 'emp';
-        $fullname = esc_html($data['fullname']);
-        $contact_number = esc_html($data['contact']);
-        $gender = esc_html($data['gender']);
-        $employee_status = esc_html($data['employee_status']);
-        $email = esc_html($data['email']);
-        $user_bio = esc_html($data['user_bio']);
-        $id = esc_html($id);
+        $fullname = sanitize_text_field($data['fullname']);
+        $contact_number = sanitize_text_field($data['contact']);
+        $gender = sanitize_text_field($data['gender']);
+        $employee_status = sanitize_text_field($data['employee_status']);
+        $email = sanitize_email($data['email']);
+        $user_bio = sanitize_text_field($data['user_bio']);
+        $id = sanitize_text_field($id);
 
         $query = "UPDATE `$wp_emp` SET `fullname` = '$fullname', `email` = '$email', `contact_number` = '$contact_number', `gender` = '$gender', `user_bio` = '$user_bio', `employee_status` = '$employee_status' WHERE `id` = $id";
         $wpdb->query($query);
@@ -289,7 +291,7 @@ class UM_Form_Render
     {
         global $wpdb, $table_prefix;
         $wp_emp = $table_prefix . 'emp';
-        $id = esc_html($_GET['id']);
+        $id = esc_sql($_GET['id']);
 
         $query = "DELETE FROM $wp_emp WHERE `id` = $id";
         $wpdb->query($query);
