@@ -49,9 +49,8 @@
         var edit_fullname = "#edit_fullname_"+id;
         var edit_email = "#edit_email_"+id;
         var edit_contact = "#edit_contact_"+id;
-        var edit_gender = "#edit_gender_"+id;
         var edit_user_bio = "#edit_user_bio_"+id;
-        var edit_employee_status = "#edit_employee_status_"+id;
+        var employee_status = "#employee_status_"+id;
 
         // Get the value from edit form input
         var fullname = jQuery(edit_fullname).val();
@@ -59,7 +58,7 @@
         var contact = jQuery(edit_contact).val();
         var gender = jQuery("input[name='gender']:checked").val();
         var user_bio = jQuery(edit_user_bio).val();
-        var employee_status = jQuery(edit_employee_status).val();
+        var val_employee_status = jQuery(employee_status).val();
 
         // employee data array
         var dataArr = {
@@ -68,7 +67,7 @@
             'contact':contact,
             'gender':gender,
             'user_bio':user_bio,
-            'employee_status':employee_status,
+            'employee_status':val_employee_status,
         }
         console.log(fullname);
         jQuery.ajax({
@@ -136,18 +135,40 @@
                     html += `<tr>
                         <td>${++i}</td>
                         <td><img src="${element.picture}"  width="50" height="50"></td>
-                        <td><span id="name_field_${element.id}">${element.fullname}</span><input id="edit_fullname_${element.id}" type="text" style="display:none" value="${element.fullname}"></td>
-                        <td><span id="email_field_${element.id}">${element.email}</span><input id="edit_email_${element.id}" type="text" style="display:none" value="${element.email}"></td>
-                        <td><span id="contact_field_${element.id}">${element.contact_number}</span><input id="edit_contact_${element.id}" type="text" style="display:none" value="${element.contact_number}"></td>
-                        <td><span id="gender_field_${element.id}">${element.gender}</span>
+                        <td>
+                        <span id="name_field_${element.id}">${element.fullname}</span>
+                        <input id="edit_fullname_${element.id}" type="text" style="display:none" value="${element.fullname}">
+                        </td>
+                        <td>
+                        <span id="email_field_${element.id}">${element.email}</span>
+                        <input id="edit_email_${element.id}" type="text" style="display:none" value="${element.email}">
+                        </td>
+                        <td>
+                        <span id="contact_field_${element.id}">${element.contact_number}</span>
+                        <input id="edit_contact_${element.id}" type="text" style="display:none" value="${element.contact_number}">
+                        </td>
+                        <td>
+                        <span id="gender_field_${element.id}">${element.gender}</span>
                         <div id="edit_gender_${element.id}" style="display:none">
-                        <input type="radio" name="gender" value="male"><label for="">Male</label><br>
+                        <input type="radio" name="gender" value="male" ><label for="">Male</label><br>
                         <input type="radio" name="gender" value="female"><label for="">Female</label><br>
                         <input type="radio" name="gender" value="others"><label for="">Others</label>
                         </div>
                         </td>
-                        <td><span id="user_bio_field_${element.id}">${element.user_bio}</span><input id="edit_user_bio_${element.id}" type="text" style="display:none" value="${element.user_bio}"></td>
-                        <td><span id="employee_status_field_${element.id}">${element.employee_status}</span><input id="edit_employee_status_${element.id}" type="text" style="display:none" value="${element.employee_status}"></td>
+                        <td>
+                        <span id="user_bio_field_${element.id}">${element.user_bio}</span>
+                        <input id="edit_user_bio_${element.id}" type="text" style="display:none" value="${element.user_bio}">
+                        </td>
+                        <td>
+                        <span id="employee_status_field_${element.id}">${element.employee_status}</span>
+                        <div id="edit_employee_status_${element.id}" style="display:none">
+                        <select id="employee_status_${element.id}">
+                            <option value="" disabled selected>Select The Status</option>
+                            <option value="active">Active</option>
+                            <option value="diactive">Diactivate</option>
+                        </select>
+                        </div>
+                        </td>
                         <td>
                             <button id="edit_employee_${element.id}" onclick="edit_employee_table(${element.id})">Edit</button>
                             <button id="update_employee_${element.id}" onclick="update_employee_table(${element.id})" style="display:none">Update</button>
