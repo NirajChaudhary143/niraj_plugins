@@ -84,6 +84,31 @@
             }
         });
     }
+
+    /**
+     * delete_employee_table function is used to delete the employee from table
+     */
+    function delete_employee_table(id) {
+        var confirmDelete = confirm("Are you sure want to delete employee details.");
+        var id = id;
+        if (confirmDelete) {
+            jQuery.ajax({
+                url: um_employee_url_obj.ajaxurl,
+                type: "GET",
+                data:{
+                   id: id,
+                   action: 'delete-emp-data' 
+                },
+                success: function(response){
+                    if (response.success) {
+                        jQuery("#message").html("<span style='color:white;background-color:red;padding:5px'>Employee Deleted Succesfully</span>")
+                        jQuery("#message").fadeOut(5000);
+                    }
+                    getEmployeeData();
+                }
+            })
+        }
+    }
 /**
  * getEmployeeData is a function which load the data in employee table
  */
@@ -99,7 +124,6 @@
                 orderby: orderBy,
             },
             success: function (response) {
-                console.log("get emp data");
                 emp_array_data = response.data.emp_data;
                 var i = 0;
                 var html= ''
@@ -111,7 +135,7 @@
                      */
                     html += `<tr>
                         <td>${++i}</td>
-                        <td>Image</td>
+                        <td><img src="${element.picture}"  width="50" height="50"></td>
                         <td><span id="name_field_${element.id}">${element.fullname}</span><input id="edit_fullname_${element.id}" type="text" style="display:none" value="${element.fullname}"></td>
                         <td><span id="email_field_${element.id}">${element.email}</span><input id="edit_email_${element.id}" type="text" style="display:none" value="${element.email}"></td>
                         <td><span id="contact_field_${element.id}">${element.contact_number}</span><input id="edit_contact_${element.id}" type="text" style="display:none" value="${element.contact_number}"></td>
@@ -121,7 +145,7 @@
                         <td>
                             <button id="edit_employee_${element.id}" onclick="edit_employee_table(${element.id})">Edit</button>
                             <button id="update_employee_${element.id}" onclick="update_employee_table(${element.id})" style="display:none">Update</button>
-                            <button id="delete_employee_${element.id}">Delete</button>
+                            <button id="delete_employee_${element.id}" onclick="delete_employee_table(${element.id})">Delete</button>
                         </td>
                         </tr>`;
                     });
@@ -272,11 +296,28 @@ jQuery(document).ready(function( $ ){
             var employee_status =$("#employee_status").val();
             validate_status(employee_status);
 
-            var image =$("#image").val();
-            console.log(image);
+            var image =$("#image")[0].files[0];
+            console.log(image.name);
 
             var gender =$("input[name='gender']:checked").val(); 
             validate_gender(gender);
+
+            // Create a FormData object
+            var formData = new FormData();
+
+            // Append form data to the FormData object
+            formData.append('action', 'um-store-data');
+            formData.append('fullname', fullname);
+            formData.append('email', email);
+            formData.append('gender', gender);
+            formData.append('contact_number', contact_number);
+            formData.append('user_bio', user_bio);
+            formData.append('employee_status', employee_status);
+
+            // Append the file to FormData
+            formData.append('image', $("#image")[0].files[0]);
+
+            formData.append('nonce', um_employee_url_obj.nonce);
 
      /**
       * Using ajax for storing the data into database
@@ -291,19 +332,13 @@ jQuery(document).ready(function( $ ){
             $.ajax({
                 type: 'POST',
                 url: ajaxurl,
-                data: {
-                    action: 'um-store-data',
-                    fullname: fullname,
-                    email: email,
-                    gender: gender,
-                    contact_number: contact_number,
-                    user_bio: user_bio,
-                    employee_status: employee_status,
-                    image: image,
-                    nonce: um_employee_url_obj.nonce 
-                },
+                data: formData,
+                processData: false,
+                contentType: false,
                 success: function( response ){
-                    $("#success").html('<span style="background-color: green; color:white;padding:4px">User Register Succesfully.</span>'); 
+                    if (response.success) {    
+                        $("#success").html('<span style="background-color: green; color:white;padding:4px">User Register Succesfully.</span>'); 
+                    }
                     
                 }
             });

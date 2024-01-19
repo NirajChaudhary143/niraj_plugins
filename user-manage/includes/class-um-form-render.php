@@ -22,6 +22,7 @@ class UM_Form_Render
         add_action('wp_ajax_um-store-data', array($this, 'um_save_employee_details'));
         add_action('wp_ajax_um-get-data', array($this, 'um_get_employee_details'));
         add_action('wp_ajax_um-update-employee-details', array($this, 'um_update_employee_details_fn'));
+        add_action('wp_ajax_delete-emp-data', array($this, 'um_delete_employe_fn'));
         add_action('um_save_employee_details', array($this, 'um_save_employee_details_fn'), 10, 7);
 
         // Filter Hooks
@@ -49,47 +50,51 @@ class UM_Form_Render
     public function um_form_template($hook)
     {
         ob_start();
+        if (is_user_logged_in()) :
 ?>
-        <div>
-            <div id="success"></div>
-            <form action="" enctype="multipart/form-data" method="POST">
-                <?php wp_nonce_field('um_employee_nonce', 'um_employee_nonce'); ?>
-                <label for="">Full Name</label>
-                <input type="text" id="fullname">
-                <div id="error_name" style="color: red;">
-                </div>
-                <label for="">Email</label>
-                <input type="email" id="email">
-                <div id="error_email" style="color: red;">
-                </div>
-                <label for="">Contact Number</label>
-                <input type="text" id="contact_number">
-                <div id="error_phone_number" style="color: red;">
-                </div>
-                <label for="">Gender</label><br>
-                <input type="radio" name="gender" value="male"><label for="">Male</label>
-                <input type="radio" name="gender" value="female"><label for="">Female</label>
-                <input type="radio" name="gender" value="others"><label for="">Others</label><br>
-                <div id="error_gender" style="color: red;">
-                </div>
-                <label for="">User Bio</label>
-                <textarea id="user_bio" rows="3"></textarea>
-                <div id="error_user_bio" style="color: red;">
-                </div>
-                <label for="">Employee Status</label>
-                <select id="employee_status">
-                    <option value="" disabled selected>Select The Status</option>
-                    <option value="active">Active</option>
-                    <option value="diactive">Diactivate</option>
-                </select>
-                <div id="error_status" style="color: red;">
-                </div>
-                <label for="">Profile Image</label><br>
-                <input type="file" id="image"><br><br>
-                <input type="submit" value="Add Employee" id="submit_btn">
-            </form>
-        </div>
-    <?php
+            <div>
+                <div id="success"></div>
+                <form action="" enctype="multipart/form-data" method="POST">
+                    <?php wp_nonce_field('um_employee_nonce', 'um_employee_nonce'); ?>
+                    <label for="">Full Name</label>
+                    <input type="text" id="fullname">
+                    <div id="error_name" style="color: red;">
+                    </div>
+                    <label for="">Email</label>
+                    <input type="email" id="email">
+                    <div id="error_email" style="color: red;">
+                    </div>
+                    <label for="">Contact Number</label>
+                    <input type="text" id="contact_number">
+                    <div id="error_phone_number" style="color: red;">
+                    </div>
+                    <label for="">Gender</label><br>
+                    <input type="radio" name="gender" value="male"><label for="">Male</label>
+                    <input type="radio" name="gender" value="female"><label for="">Female</label>
+                    <input type="radio" name="gender" value="others"><label for="">Others</label><br>
+                    <div id="error_gender" style="color: red;">
+                    </div>
+                    <label for="">User Bio</label>
+                    <textarea id="user_bio" rows="3"></textarea>
+                    <div id="error_user_bio" style="color: red;">
+                    </div>
+                    <label for="">Employee Status</label>
+                    <select id="employee_status">
+                        <option value="" disabled selected>Select The Status</option>
+                        <option value="active">Active</option>
+                        <option value="diactive">Diactivate</option>
+                    </select>
+                    <div id="error_status" style="color: red;">
+                    </div>
+                    <label for="">Profile Image</label><br>
+                    <input type="file" id="image" name="image"><br><br>
+                    <input type="submit" value="Add Employee" id="submit_btn">
+                </form>
+            </div>
+        <?php
+        else :
+            echo "<h1>You must logged in first.</h1>";
+        endif;
         $html = ob_get_clean();
         return $html;
     }
@@ -101,9 +106,9 @@ class UM_Form_Render
     public function um_employee_table_template()
     {
         ob_start();
-    ?>
+        ?>
         <div>
-            <div id="edit_form">
+            <div id="message">
 
             </div>
             <table>
@@ -127,9 +132,13 @@ class UM_Form_Render
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody id="um_emp_table">
+                <?php if (is_user_logged_in()) : ?>
+                    <tbody id="um_emp_table">
 
-                </tbody>
+                    </tbody>
+                <?php else : ?>
+                    <h1>You Must Log in first</h1>
+                <?php endif ?>
             </table>
         </div>
 <?php
@@ -145,16 +154,27 @@ class UM_Form_Render
     public function um_save_employee_details()
     {
         if (isset($_POST['nonce']) && wp_verify_nonce($_POST['nonce'], 'um_employee_nonce')) {
-            if (isset($_POST['fullname'], $_POST['email'], $_POST['gender'], $_POST['contact_number'], $_POST['user_bio'], $_POST['employee_status'], $_POST['image'])) {
+            if (isset($_POST['fullname'], $_POST['email'], $_POST['gender'], $_POST['contact_number'], $_POST['user_bio'], $_POST['employee_status'], $_FILES['image'])) {
                 $fullname = sanitize_text_field($_POST['fullname']);
                 $email = sanitize_email($_POST['email']);
                 $contact_number = sanitize_text_field($_POST['contact_number']);
                 $gender = sanitize_text_field($_POST['gender']);
                 $user_bio = sanitize_textarea_field($_POST['user_bio']);
                 $employee_status = sanitize_text_field($_POST['employee_status']);
-                $image = sanitize_text_field($_POST['image']);
+
+                $file = $_FILES['image'];
+                $ext = explode('/', $file['type'])[1];
+                $file_name = $contact_number . '.' . $ext;
+                error_log(print_r($file_name, true));
+
+
+                $image = wp_upload_bits($file_name, null, file_get_contents($file['tmp_name']));
+                error_log(print_r($image, true));
+
+                $target_file = $image['url'];
+
                 // do_action to store the data
-                do_action('um_save_employee_details', $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $image);
+                do_action('um_save_employee_details', $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $target_file);
             } else {
                 wp_send_json_error(array('message' => 'Incomplete data received.'));
             }
@@ -171,16 +191,16 @@ class UM_Form_Render
      * @param string $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $image
      */
 
-    public function um_save_employee_details_fn($fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $image)
+    public function um_save_employee_details_fn($fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $target_file)
     {
         $data = array(
-            'fullname' => $fullname,
-            'email' => $email,
-            'contact_number' => $contact_number,
-            'gender' => $gender,
-            'user_bio' => $user_bio,
-            'employee_status' => $employee_status,
-            'picture' => $image,
+            'fullname' => sanitize_text_field($fullname),
+            'email' => sanitize_text_field($email),
+            'contact_number' => sanitize_text_field($contact_number),
+            'gender' => sanitize_text_field($gender),
+            'user_bio' => sanitize_text_field($user_bio),
+            'employee_status' => sanitize_text_field($employee_status),
+            'picture' => sanitize_text_field($target_file),
         );
 
         global $wpdb, $table_prefix;
@@ -254,10 +274,24 @@ class UM_Form_Render
         $employee_status = esc_html($data['employee_status']);
         $email = esc_html($data['email']);
         $user_bio = esc_html($data['user_bio']);
+        $id = esc_html($id);
         $query = "UPDATE `$wp_emp` SET `fullname` = '$fullname', `email` = '$email', `contact_number` = '$contact_number', `gender` = '$gender', `user_bio` = '$user_bio', `employee_status` = '$employee_status' WHERE `id` = $id";
         $wpdb->query($query);
         $data = $wpdb->get_results("SELECT * FROM $wp_emp WHERE id =$id");
         return $data;
+    }
+    /**
+     * wp_ajax_delete-emp-data ajax actions function
+     */
+    public function um_delete_employe_fn()
+    {
+        global $wpdb, $table_prefix;
+        $wp_emp = $table_prefix . 'emp';
+        $id = esc_html($_GET['id']);
+
+        $query = "DELETE FROM $wp_emp WHERE `id` = $id";
+        $wpdb->query($query);
+        wp_send_json_success();
     }
 }
 new UM_Form_Render();
