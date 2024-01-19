@@ -10,7 +10,8 @@
  * 
  * @package userManage/
  */
-
+define('UM_PATH_URL', plugin_dir_url(__FILE__));
+define('UM_PATH_DIR', plugin_dir_path(__FILE__));
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly.
 }

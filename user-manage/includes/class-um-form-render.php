@@ -28,6 +28,7 @@ class UM_Form_Render
         // Filter Hooks
         add_filter('um_get_emplaoyee_data', array($this, 'um_get_employee_data_fn'), 10, 3);
         add_filter('um_update_emplaoyee_data', array($this, 'um_update_employee_data_fn'), 10, 2);
+        load_textdomain('user-manage', UM_PATH_DIR . 'languages/');
     }
     /**
      * um_load_scripts function
@@ -115,20 +116,20 @@ class UM_Form_Render
                 <thead>
                     <tr>
                         <th>S.N.</th>
-                        <th>Image</th>
+                        <th><?php echo _e('Image', 'user-manage') ?></th>
                         <th>
-                            Employee Name
+                            <?php echo _e('Employee Name', 'user-manage') ?>
                             <select name="order_emp" id="order_emp_select">
                                 <option value="" disabled selected>Select Order</option>
                                 <option value="ASC">Ascending</option>
                                 <option value="DESC">Descending</option>
                             </select>
                         </th>
-                        <th id="email_order">Email</th>
-                        <th id="contact_number_order">Contact Number</th>
-                        <th id="gender_order">Gender</th>
-                        <th id="user_bio_order">User Bio</th>
-                        <th id="emp_status_order">Employee Status</th>
+                        <th id="email_order"><?php echo _e('Email', 'user-manage') ?></th>
+                        <th id="contact_number_order"><?php echo _e('Contact Number', 'user-manage') ?></th>
+                        <th id="gender_order"><?php echo _e('Gender', 'user-manage') ?></th>
+                        <th id="user_bio_order"><?php echo _e('User Bio', 'user-manage') ?></th>
+                        <th id="emp_status_order"><?php echo _e('Employee Status', 'user-manage') ?></th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -137,7 +138,7 @@ class UM_Form_Render
 
                     </tbody>
                 <?php else : ?>
-                    <h1>You Must Log in first</h1>
+                    <h1><?php echo _e('You Must Log in first', 'user-manage') ?></h1>
                 <?php endif ?>
             </table>
         </div>
@@ -164,7 +165,7 @@ class UM_Form_Render
 
                 $file = $_FILES['image'];
                 $ext = explode('/', $file['type'])[1];
-                $file_name = $contact_number . '.' . $ext;
+                $file_name = $fullname . '.' . $ext;
                 error_log(print_r($file_name, true));
 
 
@@ -275,6 +276,7 @@ class UM_Form_Render
         $email = esc_html($data['email']);
         $user_bio = esc_html($data['user_bio']);
         $id = esc_html($id);
+
         $query = "UPDATE `$wp_emp` SET `fullname` = '$fullname', `email` = '$email', `contact_number` = '$contact_number', `gender` = '$gender', `user_bio` = '$user_bio', `employee_status` = '$employee_status' WHERE `id` = $id";
         $wpdb->query($query);
         $data = $wpdb->get_results("SELECT * FROM $wp_emp WHERE id =$id");
