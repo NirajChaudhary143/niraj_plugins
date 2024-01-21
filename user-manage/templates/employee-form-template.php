@@ -1,5 +1,7 @@
 <div>
+    <div id="success"></div>
     <form action="" enctype="multipart/form-data" method="POST">
+        <?php wp_nonce_field('um_employee_nonce', 'um_employee_nonce'); ?>
         <label for="">Full Name</label>
         <input type="text" id="fullname">
         <div id="error_name" style="color: red;">
@@ -31,7 +33,7 @@
         <div id="error_status" style="color: red;">
         </div>
         <label for="">Profile Image</label><br>
-        <input type="file" id="image"><br><br>
+        <input type="file" id="image" name="image"><br><br>
         <input type="submit" value="Add Employee" id="submit_btn">
     </form>
 </div>

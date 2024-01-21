@@ -28,7 +28,7 @@ class UM_Form_Render
         // Filter Hooks
         add_filter('um_get_emplaoyee_data', array($this, 'um_get_employee_data_fn'), 10, 3);
         add_filter('um_update_emplaoyee_data', array($this, 'um_update_employee_data_fn'), 10, 2);
-        load_textdomain('user-manage', UM_PATH_DIR . 'languages/');
+        // load_textdomain('user-manage', UM_PATH_DIR . 'languages');
     }
     /**
      * um_load_scripts function
@@ -166,8 +166,6 @@ class UM_Form_Render
                 $file = $_FILES['image'];
                 $ext = explode('/', $file['type'])[1];
                 $file_name = $fullname . '.' . $ext;
-                error_log(print_r($file_name, true));
-
 
                 $image = wp_upload_bits($file_name, null, file_get_contents($file['tmp_name']));
                 error_log(print_r($image, true));
@@ -199,7 +197,7 @@ class UM_Form_Render
             'email' => sanitize_text_field($email),
             'contact_number' => sanitize_text_field($contact_number),
             'gender' => sanitize_text_field($gender),
-            'user_bio' => sanitize_text_field($user_bio),
+            'user_bio' => sanitize_textarea_field($user_bio),
             'employee_status' => sanitize_text_field($employee_status),
             'picture' => sanitize_text_field($target_file),
         );
@@ -220,11 +218,15 @@ class UM_Form_Render
     public function um_get_employee_data_fn($data, $order, $orderBy)
     {
         global $wpdb, $table_prefix;
-        $order = esc_sql($order);
-        $orderBy = esc_sql($orderBy);
+        $order = sanitize_text_field($order);
+        $orderBy = sanitize_sql_orderby($orderBy);
         $wp_emp = $table_prefix . 'emp';
         if ($order != "" && $orderBy != "") {
-            $data = $wpdb->get_results("SELECT * FROM $wp_emp ORDER BY $orderBy $order");
+            if ($order === 'ASC') {
+                $data = $wpdb->get_results("SELECT * FROM $wp_emp ORDER BY $orderBy ASC");
+            } else {
+                $data = $wpdb->get_results("SELECT * FROM $wp_emp ORDER BY $orderBy DESC");
+            }
             return $data;
         } else {
             $query = "SELECT * FROM $wp_emp";
@@ -259,7 +261,15 @@ class UM_Form_Render
     public function um_update_employee_details_fn()
     {
         $id = $_POST['id'];
-        $data = $_POST['emp_data'];
+        $data = array(
+            'fullname' => $_POST['fullname'],
+            'email' => $_POST['email'],
+            'contact' => $_POST['contact'],
+            'image' => $_FILES['image'],
+            'gender' => $_POST['gender'],
+            'user_bio' => $_POST['user_bio'],
+            'employee_status' => $_POST['employee_status'],
+        );
         $data = apply_filters('um_update_emplaoyee_data', $data, $id);
         wp_send_json_success(array('updated_data' => $data));
     }
@@ -279,7 +289,16 @@ class UM_Form_Render
         $user_bio = sanitize_text_field($data['user_bio']);
         $id = sanitize_text_field($id);
 
-        $query = "UPDATE `$wp_emp` SET `fullname` = '$fullname', `email` = '$email', `contact_number` = '$contact_number', `gender` = '$gender', `user_bio` = '$user_bio', `employee_status` = '$employee_status' WHERE `id` = $id";
+        $file = $_FILES['image'];
+        $ext = explode('/', $file['type'])[1];
+        $file_name = $id . '.' . $ext;
+
+        $image = wp_upload_bits($file_name, null, file_get_contents($file['tmp_name']));
+        error_log(print_r($image, true));
+
+        $target_file = $image['url'];
+
+        $query = "UPDATE `$wp_emp` SET `fullname` = '$fullname', `email` = '$email', `contact_number` = '$contact_number', `gender` = '$gender', `user_bio` = '$user_bio', `employee_status` = '$employee_status',  `picture` = '$target_file' WHERE `id` = $id";
         $wpdb->query($query);
         $data = $wpdb->get_results("SELECT * FROM $wp_emp WHERE id =$id");
         return $data;
@@ -291,7 +310,7 @@ class UM_Form_Render
     {
         global $wpdb, $table_prefix;
         $wp_emp = $table_prefix . 'emp';
-        $id = esc_sql($_GET['id']);
+        $id = sanitize_text_field($_GET['id']);
 
         $query = "DELETE FROM $wp_emp WHERE `id` = $id";
         $wpdb->query($query);

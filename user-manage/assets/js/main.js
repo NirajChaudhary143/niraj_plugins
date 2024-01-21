@@ -9,6 +9,7 @@
         var contact_field = "#contact_field_"+id;
         var user_bio_field = "#user_bio_field_"+id;
         var employee_status_field = "#employee_status_field_"+id;
+        var image = "#image_"+id;
 
         // edit part
         var edit_fullname = "#edit_fullname_"+id;
@@ -19,6 +20,7 @@
         var edit_employee_status = "#edit_employee_status_"+id;
         var edit_employee = "#edit_employee_"+id;
         var update_employee = "#update_employee_"+id;
+        var edit_image = "#edit_image_"+id;
         
         // hide data
         jQuery(name_field).css("display","none");
@@ -27,6 +29,7 @@
         jQuery(gender_field).css("display","none");
         jQuery(user_bio_field).css("display","none");
         jQuery(employee_status_field).css("display","none");
+        jQuery(image).css("display","none");
 
         // edit
         jQuery(edit_fullname).css("display","block");
@@ -35,6 +38,7 @@
         jQuery(edit_employee_status).css("display","block");
         jQuery(edit_gender).css("display","block");
         jQuery(edit_user_bio).css("display","block");
+        jQuery(edit_image).css("display","block");
 
         // toggle edit and update button
         jQuery(edit_employee).css("display","none");
@@ -51,6 +55,8 @@
         var edit_contact = "#edit_contact_"+id;
         var edit_user_bio = "#edit_user_bio_"+id;
         var employee_status = "#employee_status_"+id;
+        var edit_image = "#edit_image_"+id;
+
 
         // Get the value from edit form input
         var fullname = jQuery(edit_fullname).val();
@@ -59,25 +65,32 @@
         var gender = jQuery("input[name='gender']:checked").val();
         var user_bio = jQuery(edit_user_bio).val();
         var val_employee_status = jQuery(employee_status).val();
+        var image =  jQuery(edit_image)[0].files[0];
+        console.log(image);
+        
+        //formdata object
+        var emp_data = new FormData();
 
         // employee data array
-        var dataArr = {
-            'fullname':fullname,
-            'email':email,
-            'contact':contact,
-            'gender':gender,
-            'user_bio':user_bio,
-            'employee_status':val_employee_status,
-        }
+        emp_data.append('fullname',fullname);
+        emp_data.append('email',email);
+        emp_data.append('contact',contact);
+        emp_data.append('gender',gender);
+        emp_data.append('user_bio',user_bio);
+        emp_data.append('employee_status',val_employee_status);
+        emp_data.append('image',image);
+        emp_data.append('id',id);
+
+        //Ajax action
+        emp_data.append('action','um-update-employee-details');
+
         console.log(fullname);
         jQuery.ajax({
             url: um_employee_url_obj.ajaxurl,
             type: "POST",
-            data: {
-                action: 'um-update-employee-details',
-                id: id,
-                emp_data: dataArr,
-            },
+            processData: false,
+            contentType: false,
+            data:  emp_data,
             success: function(response){
                 getEmployeeData();
             }
@@ -132,8 +145,11 @@
                 var html= ''
                 emp_array_data.forEach(element => {
                     html += `<tr>
+                    <form action="" enctype="multipart/form-data" method="POST">
                         <td>${++i}</td>
-                        <td><img src="${element.picture}"  width="50" height="50"></td>
+                        <td><img id="image_${element.id}" src="${element.picture}"  width="50" height="50">
+                        <input type="file" id="edit_image_${element.id}" name="image" style="display:none">
+                        </td>
                         <td>
                         <span id="name_field_${element.id}">${element.fullname}</span>
                         <input id="edit_fullname_${element.id}" type="text" style="display:none" value="${element.fullname}">
@@ -149,9 +165,9 @@
                         <td>
                         <span id="gender_field_${element.id}">${element.gender}</span>
                         <div id="edit_gender_${element.id}" style="display:none">
-                        <input type="radio" name="gender" value="male" ><label for="">Male</label><br>
-                        <input type="radio" name="gender" value="female"><label for="">Female</label><br>
-                        <input type="radio" name="gender" value="others"><label for="">Others</label>
+                        <input type="radio" name="gender" value="male" ${element.gender==='male' ? 'checked' : ''} ><label for="">Male</label><br>
+                        <input type="radio" name="gender" value="female" ${element.gender==='female' ? 'checked' : ''}><label for="">Female</label><br>
+                        <input type="radio" name="gender" value="others"${element.gender==='others' ? 'checked' : ''}><label for="">Others</label>
                         </div>
                         </td>
                         <td>
@@ -173,6 +189,7 @@
                             <button id="update_employee_${element.id}" onclick="update_employee_table(${element.id})" style="display:none">Update</button>
                             <button id="delete_employee_${element.id}" onclick="delete_employee_table(${element.id})">Delete</button>
                         </td>
+                        </form>
                         </tr>`;
                     });
                     jQuery("#um_emp_table").empty().append(html);
