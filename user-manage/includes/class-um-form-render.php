@@ -28,7 +28,6 @@ class UM_Form_Render
         // Filter Hooks
         add_filter('um_get_emplaoyee_data', array($this, 'um_get_employee_data_fn'), 10, 3);
         add_filter('um_update_emplaoyee_data', array($this, 'um_update_employee_data_fn'), 10, 2);
-        // load_textdomain('user-manage', UM_PATH_DIR . 'languages');
     }
     /**
      * um_load_scripts function
@@ -48,7 +47,7 @@ class UM_Form_Render
     /**
      * um_form_template function render the registration form
      */
-    public function um_form_template($hook)
+    public function um_form_template()
     {
         ob_start();
         if (is_user_logged_in()) :
@@ -110,12 +109,11 @@ class UM_Form_Render
         ?>
         <div>
             <div id="message">
-
             </div>
             <table>
                 <thead>
                     <tr>
-                        <th>S.N.</th>
+                        <th><?php _e("S.N.", "user-manage") ?></th>
                         <th><?php _e('Image', 'user-manage') ?></th>
                         <th>
                             <?php _e('Employee Name', 'user-manage') ?>
@@ -310,7 +308,7 @@ class UM_Form_Render
         $query = $wpdb->prepare("UPDATE `$wp_emp` SET `fullname` = '%s', `email` = '%s', `contact_number` = '%s', `gender` = '%s', `user_bio` = '%s', `employee_status` = '%s',  `picture` = '%s' WHERE `id` = %d", $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $target_file, $id);
         $wpdb->query($query);
         // Get the data of all employee
-        $query = $wpdb->prepare("SELECT * FROM $wp_emp WHERE id =%d", $id);
+        $query = $wpdb->prepare("SELECT * FROM $wp_emp WHERE id = %d", $id);
         $data = $wpdb->get_results($query);
         return $data;
     }
