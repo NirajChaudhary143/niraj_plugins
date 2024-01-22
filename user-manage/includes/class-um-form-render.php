@@ -57,44 +57,44 @@ class UM_Form_Render
                 <div id="success"></div>
                 <form action="" enctype="multipart/form-data" method="POST">
                     <?php wp_nonce_field('um_employee_nonce', 'um_employee_nonce'); ?>
-                    <label for="">Full Name</label>
+                    <label for=""><?php _e("Full Name", "user-manage") ?></label>
                     <input type="text" id="fullname">
                     <div id="error_name" style="color: red;">
                     </div>
-                    <label for="">Email</label>
+                    <label for=""><?php _e("Email", "user-manage") ?></label>
                     <input type="email" id="email">
                     <div id="error_email" style="color: red;">
                     </div>
-                    <label for="">Contact Number</label>
+                    <label for=""><?php _e("Contact Number", "user-manage") ?></label>
                     <input type="text" id="contact_number">
                     <div id="error_phone_number" style="color: red;">
                     </div>
-                    <label for="">Gender</label><br>
-                    <input type="radio" name="gender" value="male"><label for="">Male</label>
-                    <input type="radio" name="gender" value="female"><label for="">Female</label>
-                    <input type="radio" name="gender" value="others"><label for="">Others</label><br>
+                    <label for=""><?php _e("Gender", "user-manage") ?></label><br>
+                    <input type="radio" name="gender" value="male"><label for=""><?php _e("Male", "user-manage") ?></label>
+                    <input type="radio" name="gender" value="female"><label for=""><?php _e("Female", "user-manage") ?></label>
+                    <input type="radio" name="gender" value="others"><label for=""><?php _e("Others", "user-manage") ?></label><br>
                     <div id="error_gender" style="color: red;">
                     </div>
-                    <label for="">User Bio</label>
+                    <label for=""><?php _e("User Bio", "user-manage") ?></label>
                     <textarea id="user_bio" rows="3"></textarea>
                     <div id="error_user_bio" style="color: red;">
                     </div>
-                    <label for="">Employee Status</label>
+                    <label for=""><?php _e("Employee Status", "user-manage") ?></label>
                     <select id="employee_status">
-                        <option value="" disabled selected>Select The Status</option>
-                        <option value="active">Active</option>
-                        <option value="diactive">Diactivate</option>
+                        <option value="" disabled selected><?php _e("Select The Status", "user-manage") ?></option>
+                        <option value="active"><?php _e("Active", "user-manage") ?></option>
+                        <option value="diactive"><?php _e("Diactivate", "user-manage") ?></option>
                     </select>
                     <div id="error_status" style="color: red;">
                     </div>
-                    <label for="">Profile Image</label><br>
+                    <label for=""><?php _e("Profile Image", "user-manage") ?></label><br>
                     <input type="file" id="image" name="image"><br><br>
                     <input type="submit" value="Add Employee" id="submit_btn">
                 </form>
             </div>
         <?php
         else :
-            echo "<h1>You must logged in first.</h1>";
+            echo wp_kses_post("<h1>You must logged in first.</h1>");
         endif;
         $html = ob_get_clean();
         return $html;
@@ -116,20 +116,20 @@ class UM_Form_Render
                 <thead>
                     <tr>
                         <th>S.N.</th>
-                        <th><?php echo _e('Image', 'user-manage') ?></th>
+                        <th><?php _e('Image', 'user-manage') ?></th>
                         <th>
-                            <?php echo _e('Employee Name', 'user-manage') ?>
+                            <?php _e('Employee Name', 'user-manage') ?>
                             <select name="order_emp" id="order_emp_select">
-                                <option value="" disabled selected>Select Order</option>
-                                <option value="ASC">Ascending</option>
-                                <option value="DESC">Descending</option>
+                                <option value="" disabled selected><?php _e("Select Order", "user-manage") ?></option>
+                                <option value="ASC"><?php _e("Ascending", "user-manage") ?></option>
+                                <option value="DESC"><?php _e("Descending", "user-manage") ?></option>
                             </select>
                         </th>
-                        <th id="email_order"><?php echo _e('Email', 'user-manage') ?></th>
-                        <th id="contact_number_order"><?php echo _e('Contact Number', 'user-manage') ?></th>
-                        <th id="gender_order"><?php echo _e('Gender', 'user-manage') ?></th>
-                        <th id="user_bio_order"><?php echo _e('User Bio', 'user-manage') ?></th>
-                        <th id="emp_status_order"><?php echo _e('Employee Status', 'user-manage') ?></th>
+                        <th id="email_order"><?php _e('Email', 'user-manage') ?></th>
+                        <th id="contact_number_order"><?php _e('Contact Number', 'user-manage') ?></th>
+                        <th id="gender_order"><?php _e('Gender', 'user-manage') ?></th>
+                        <th id="user_bio_order"><?php _e('User Bio', 'user-manage') ?></th>
+                        <th id="emp_status_order"><?php _e('Employee Status', 'user-manage') ?></th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -168,12 +168,20 @@ class UM_Form_Render
                 $file_name = $fullname . '.' . $ext;
 
                 $image = wp_upload_bits($file_name, null, file_get_contents($file['tmp_name']));
-                error_log(print_r($image, true));
 
                 $target_file = $image['url'];
+                $userData = [
+                    $fullname,
+                    $email,
+                    $contact_number,
+                    $gender,
+                    $user_bio,
+                    $employee_status,
+                    $target_file,
+                ];
 
                 // do_action to store the data
-                do_action('um_save_employee_details', $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $target_file);
+                do_action('um_save_employee_details', $userData);
             } else {
                 wp_send_json_error(array('message' => 'Incomplete data received.'));
             }
@@ -190,16 +198,16 @@ class UM_Form_Render
      * @param string $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $image
      */
 
-    public function um_save_employee_details_fn($fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $target_file)
+    public function um_save_employee_details_fn($userData)
     {
         $data = array(
-            'fullname' => sanitize_text_field($fullname),
-            'email' => sanitize_text_field($email),
-            'contact_number' => sanitize_text_field($contact_number),
-            'gender' => sanitize_text_field($gender),
-            'user_bio' => sanitize_textarea_field($user_bio),
-            'employee_status' => sanitize_text_field($employee_status),
-            'picture' => sanitize_text_field($target_file),
+            'fullname' => sanitize_text_field($userData['fullname']),
+            'email' => sanitize_text_field($userData['email']),
+            'contact_number' => sanitize_text_field($userData['contact_number']),
+            'gender' => sanitize_text_field($userData['gender']),
+            'user_bio' => sanitize_textarea_field($userData['user_bio']),
+            'employee_status' => sanitize_text_field($userData['employee_status']),
+            'picture' => sanitize_text_field($userData['target_file']),
         );
 
         global $wpdb, $table_prefix;
@@ -223,9 +231,11 @@ class UM_Form_Render
         $wp_emp = $table_prefix . 'emp';
         if ($order != "" && $orderBy != "") {
             if ($order === 'ASC') {
-                $data = $wpdb->get_results("SELECT * FROM $wp_emp ORDER BY $orderBy ASC");
+                $query = $wpdb->prepare("SELECT * FROM $wp_emp ORDER BY %s ASC", $orderBy);
+                $data = $wpdb->get_results($query);
             } else {
-                $data = $wpdb->get_results("SELECT * FROM $wp_emp ORDER BY $orderBy DESC");
+                $query = $wpdb->prepare("SELECT * FROM $wp_emp ORDER BY %s DESC", $orderBy);
+                $data = $wpdb->get_results($query);
             }
             return $data;
         } else {
@@ -251,7 +261,6 @@ class UM_Form_Render
         }
         // apply_filters get the employee data
         $data = apply_filters('um_get_emplaoyee_data', $data, $order, $orderBy);
-        error_log(print_r($data, true));
         wp_send_json_success(array('emp_data' => $data));
     }
 
@@ -294,13 +303,15 @@ class UM_Form_Render
         $file_name = $id . '.' . $ext;
 
         $image = wp_upload_bits($file_name, null, file_get_contents($file['tmp_name']));
-        error_log(print_r($image, true));
 
         $target_file = $image['url'];
 
-        $query = "UPDATE `$wp_emp` SET `fullname` = '$fullname', `email` = '$email', `contact_number` = '$contact_number', `gender` = '$gender', `user_bio` = '$user_bio', `employee_status` = '$employee_status',  `picture` = '$target_file' WHERE `id` = $id";
+        // Update the data of given id
+        $query = $wpdb->prepare("UPDATE `$wp_emp` SET `fullname` = '%s', `email` = '%s', `contact_number` = '%s', `gender` = '%s', `user_bio` = '%s', `employee_status` = '%s',  `picture` = '%s' WHERE `id` = %d", $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $target_file, $id);
         $wpdb->query($query);
-        $data = $wpdb->get_results("SELECT * FROM $wp_emp WHERE id =$id");
+        // Get the data of all employee
+        $query = $wpdb->prepare("SELECT * FROM $wp_emp WHERE id =%d", $id);
+        $data = $wpdb->get_results($query);
         return $data;
     }
     /**
@@ -312,7 +323,7 @@ class UM_Form_Render
         $wp_emp = $table_prefix . 'emp';
         $id = sanitize_text_field($_GET['id']);
 
-        $query = "DELETE FROM $wp_emp WHERE `id` = $id";
+        $query = $wpdb->prepare("DELETE FROM $wp_emp WHERE `id` = %d", $id);
         $wpdb->query($query);
         wp_send_json_success();
     }
