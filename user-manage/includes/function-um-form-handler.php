@@ -66,33 +66,43 @@ function um_delete_employe_fn()
  */
 function um_update_employee_details_fn()
 {
+
     global $wpdb, $table_prefix;
     $wp_emp = $table_prefix . 'emp';
 
-    $id = $_POST['id'];
-    $fullname = sanitize_text_field($_POST['fullname']);
-    $email = sanitize_email($_POST['email']);
-    $contact_number = sanitize_text_field($_POST['contact']);
-    $image = sanitize_text_field($_FILES['image']);
-    $gender = sanitize_text_field($_POST['gender']);
-    $user_bio = sanitize_text_field($_POST['user_bio']);
-    $employee_status = sanitize_text_field($_POST['employee_status']);
+    if (isset($_POST['nonce']) && wp_verify_nonce($_POST['nonce'], 'um_employee_nonce')) {
 
-    $file = $_FILES['image'];
-    $ext = explode('/', $file['type'])[1];
-    $file_name = $id . '.' . $ext;
+        $id = $_POST['id'];
+        $fullname = sanitize_text_field($_POST['fullname']);
+        $email = sanitize_email($_POST['email']);
+        $contact_number = sanitize_text_field($_POST['contact_number']);
+        $gender = sanitize_text_field($_POST['gender']);
+        $user_bio = sanitize_text_field($_POST['user_bio']);
+        $employee_status = sanitize_text_field($_POST['employee_status']);
 
-    $image = wp_upload_bits($file_name, null, file_get_contents($file['tmp_name']));
+        if (isset($_FILES['image']) && is_array($_FILES['image'])) {
+            $file = $_FILES['image'];
 
-    $target_file = $image['url'];
+            // Process the file if there are no errors
+            $ext = explode('/', $file['type'])[1];
+            $file_name = $id . '.' . $ext;
 
-    // Update the data of given id
-    $query = $wpdb->prepare("UPDATE `$wp_emp` SET `fullname` = '%s', `email` = '%s', `contact_number` = '%s', `gender` = '%s', `user_bio` = '%s', `employee_status` = '%s',  `picture` = '%s' WHERE `id` = %d", $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $target_file, $id);
-    $wpdb->query($query);
+            $image = wp_upload_bits($file_name, null, file_get_contents($file['tmp_name']));
 
-    // Get the data of all employee
-    $query = $wpdb->prepare("SELECT * FROM $wp_emp WHERE id = %d", $id);
-    $data = $wpdb->get_results($query);
+            $target_file = $image['url'];
+        } else {
+            // Handle file upload error
+            $target_file = $_POST['defaultImage'];
+        }
 
-    wp_send_json_success(array('updated_data' => $data));
+        // Update the data of given id
+        $query = $wpdb->prepare("UPDATE `$wp_emp` SET `fullname` = '%s', `email` = '%s', `contact_number` = '%s', `gender` = '%s', `user_bio` = '%s', `employee_status` = '%s',  `picture` = '%s' WHERE `id` = %d", $fullname, $email, $contact_number, $gender, $user_bio, $employee_status, $target_file, $id);
+        $wpdb->query($query);
+
+        // Get the data of all employee
+        $query = $wpdb->prepare("SELECT * FROM $wp_emp WHERE id = %d", $id);
+        $data = $wpdb->get_results($query);
+
+        wp_send_json_success(array('updated_data' => $data));
+    }
 }

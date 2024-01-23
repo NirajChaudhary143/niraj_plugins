@@ -23,3 +23,4 @@ function um_get_employee_details()
     }
     wp_send_json_success(array('emp_data' => $data));
 }
+

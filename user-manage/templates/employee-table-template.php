@@ -1,6 +1,9 @@
 <div>
     <div id="message">
     </div>
+    <div id="edit_form">
+        <?php include UM_PATH_DIR . 'templates/employee-form-template.php'; ?>
+    </div>
     <table>
         <thead>
             <tr>
