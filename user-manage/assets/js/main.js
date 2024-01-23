@@ -2,11 +2,14 @@
             * Editing the table using ajax
             */
             function edit_employee_table(id) {
-                var image_id = "#image_"+id
                 var fullname_id = "#fullname_"+id
                 var email_id = "#email_"+id
                 var contact_number_id = "#contact_"+id
                 var user_bio_id = "#user_bio_"+id
+                var imageSrc = jQuery("#image_"+id).attr('src');
+
+                jQuery("#image").hide();
+                jQuery("#edit_image").empty().append(`<img src='${imageSrc}' width='200px' height='200px'>`)
 
                 jQuery("#edit_form").show();
                 jQuery("#submit_btn").val("Update");
@@ -81,37 +84,21 @@
                                 </td>
                                 <td>
                                 <span id="email_${element.id}">${element.email}</span>
-                                <input class="edit_field_${element.id}" id="edit_email_${element.id}" type="text"  value="${element.email}" style="display:none">
                                 </td>
                                 <td>
                                 <span id="contact_${element.id}">${element.contact_number}</span>
-                                <input class="edit_field_${element.id}" id="edit_contact_${element.id}" type="text"  value="${element.contact_number}" style="display:none">
                                 </td>
                                 <td>
                                 <span id="gender_${element.id}">${element.gender}</span>
-                                <div class="edit_field_${element.id}" id="edit_gender_${element.id}" style="display:none" >
-                                <input type="radio" name="gender" value="male" ><label for="">Male</label><br>
-                                <input type="radio" name="gender" value="female"><label for="">Female</label><br>
-                                <input type="radio" name="gender" value="others"><label for="">Others</label>
-                                </div>
                                 </td>
                                 <td>
                                 <span id="user_bio_${element.id}">${element.user_bio}</span>
-                                <input class="edit_field_${element.id}" id="edit_user_bio_${element.id}" type="text"  value="${element.user_bio}" style="display:none">
                                 </td>
                                 <td>
                                 <span class="value_field_${element.id}">${element.employee_status}</span>
-                                <div class="edit_field_${element.id}" id="edit_employee_status_${element.id}" style="display:none" >
-                                <select id="employee_status_${element.id}">
-                                    <option value="" disabled selected>Select The Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="diactive">Diactivate</option>
-                                </select>
-                                </div>
                                 </td>
                                 <td>
                                     <button id="edit_employee_${element.id}" onclick="edit_employee_table(${element.id})">Edit</button>
-                                    <button id="update_employee_${element.id}" onclick="update_employee_table(${element.id})" style="display:none">Update</button>
                                     <button id="delete_employee_${element.id}" onclick="delete_employee_table(${element.id})">Delete</button>
                                 </td>
                                 </tr>`;
@@ -125,12 +112,15 @@
              * when document get loaded data are extracted using ajax request
              */
             jQuery(document).ready(function( $ ){
+
             /**
              * function getEmployeeData
              * Fetching the data using ajax adn display it on 
              */
             getEmployeeData();
+
             $("#edit_form").hide();
+
             /**
              * Onchange of employee status
             */
@@ -266,9 +256,10 @@
                     var gender =$("input[name='gender']:checked").val(); 
                     validate_gender(gender);
         
+                    
                     // Create a FormData object
                     var formData = new FormData();
-        
+                    
                     // Append form data to the FormData object
                     formData.append('fullname', fullname);
                     formData.append('email', email);
@@ -282,8 +273,8 @@
                     formData.append('image', $("#image")[0].files[0]);
                     
                     // if error occurs it will not send ajax request
-                   if ($("#error_name").text() || $("#error_email").text() || $("#error_phone_number").text() || $("#error_user_bio").text() || $("#error_status").text() || $("#error_gender").text()) {
-                       return;
+                    if ($("#error_name").text() || $("#error_email").text() || $("#error_phone_number").text() || $("#error_user_bio").text() || $("#error_status").text() || $("#error_gender").text()) {
+                        return;
                     }else{
                         var btnData = $("#submit_btn").val();
 
@@ -332,7 +323,7 @@
                         }
                     }
                 }); 
-            
+                
                 /**
                  * Order by employee name
                  */
@@ -342,4 +333,15 @@
                     var orderBy = "fullname";
                    getEmployeeData(order,orderBy);
                 })
-            })
+
+                /**
+                 * When click on image it should open the image selection option
+                 */
+                $("#edit_image").click(function(){
+                    $("#image").click();
+                });
+
+                $("#image").change(function() {
+                    $("#edit_image").empty().append("<div style='color:white;background-color:green; padding:5px'>Image Has been uploaded</div>");
+                })
+})

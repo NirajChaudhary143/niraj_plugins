@@ -33,7 +33,11 @@
         <div id="error_status" style="color: red;">
         </div>
         <label for=""><?php _e("Profile Image", "user-manage") ?></label><br>
-        <input type="file" id="image" name="image"><br><br>
+        <input type="file" id="image" name="image">
+        <span id="edit_image">
+            
+        </span>
+        <br><br>
         <input type="text" hidden id="employee_id">
         <input type="submit" value="Add Employee" id="submit_btn">
     </form>
