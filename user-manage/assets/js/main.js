@@ -316,6 +316,7 @@
                                         $("#success").html('<span style="background-color: green; color:white;padding:4px">User Register Succesfully.</span>'); 
                                         $("#fullname, #email, #contact_number, #user_bio, #employee_status, #image").val('');
                                         $("input[name='gender']").prop('checked', false);
+                                        $("#edit_image").empty();
                                         $("#success").fadeOut(5000);
                                     }    
                                 }

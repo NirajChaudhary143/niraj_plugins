@@ -12,10 +12,10 @@ function um_get_employee_details()
     $wp_emp = $table_prefix . 'emp';
 
     if ($order === 'ASC') {
-        $query  = $wpdb->prepare("SELECT * FROM $wp_emp ORDER BY `fullname` ASC");
+        $query  = "SELECT * FROM $wp_emp ORDER BY `fullname` ASC";
         $data   = $wpdb->get_results($query);
     } else if ($order === 'DESC') {
-        $query  = $wpdb->prepare("SELECT * FROM $wp_emp ORDER BY `fullname` DESC");
+        $query  = "SELECT * FROM $wp_emp ORDER BY `fullname` DESC";
         $data   = $wpdb->get_results($query);
     } else {
         $query = "SELECT * FROM $wp_emp";
@@ -23,4 +23,3 @@ function um_get_employee_details()
     }
     wp_send_json_success(array('emp_data' => $data));
 }
-
